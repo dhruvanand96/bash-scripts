@@ -59,7 +59,7 @@ done < ${array[0]}
 
 for KEY in "${!students_rec[@]}"; do
   TMP="${students_rec["$KEY"]}"
-  echo "$KEY - $TMP"
+  #echo "$KEY - $TMP"
 done
 
 declare -A wieghts_rec
@@ -83,8 +83,8 @@ while IFS= read -r line; do
     IFS=','
     read -ra ADDR <<<"$line"
     for i in "${ADDR[@]}";do
-      i="${i#"${i%%[![:space:]]*}"}"                                            
-      i="${i%"${i##*[![:space:]]}"}" 
+      i="${i#"${i%%[![:space:]]*}"}"
+      i="${i%"${i##*[![:space:]]}"}"
       wieghts_dic[${wieghts_keys[$count]}]=$i
       count=$((count+1))
     done
@@ -99,7 +99,7 @@ done < ${array[1]}
 
 for KEY in "${!wieghts_rec[@]}"; do
     TMP="${wieghts_rec["$KEY"]}"
-    echo "$KEY - $TMP"
+    #echo "$KEY - $TMP"
 done
 
 
@@ -110,8 +110,8 @@ index=0
 for i in *; do
   declare -A mark_dic
   if [ "${i}" != "${i%.${EXT}}" ];then
-    echo "I do something with the file $i"
-    echo "${i%%.*}"
+    #echo "I do something with the file $i"
+    #echo "${i%%.*}"
     while IFS= read -r line; do
         count=0
         IFS=','
@@ -134,21 +134,75 @@ done
 
 for KEY in "${!Marks[@]}"; do
   TMP="${Marks["$KEY"]}"
-  echo "$KEY - $TMP"
+  #echo "$KEY - $TMP"
 done
 
+calculateGrade() {
+
+  testing=$(echo "$2" | rev | cut -c2- | rev)  
+
+  local avg=$(( $1 * $testing  / 100 ))
+  
+  echo "$avg" 
+}
+
+getGrade(){
+
+if [ $1 -ge 40 ] && [ $1 -le 50 ]; then
+echo "E"
+elif [ $1 -ge 50 ] && [ $1 -le 55 ]; then
+echo "D"
+elif [ $1 -ge 55 ] && [ $1 -le 60 ]; then
+echo "D+"
+elif [ $1 -ge 60 ] && [ $1 -le 65 ]; then
+echo "C"
+elif [ $1 -ge 65 ] && [ $1 -le 70 ]; then
+echo "C+"
+elif [ $1 -ge 70 ] && [ $1 -le 75 ]; then
+echo "B"
+elif [ $1 -ge 75 ] && [ $1 -le 80 ]; then
+echo "B+"
+elif [ $1 -ge 80 ] && [ $1 -le 90 ]; then
+echo "A"
+elif [ $1 -ge 90 ] && [ $1 -le 100 ]; then
+echo "A+"
+else
+echo "Wrong input"
+fi
+
+}
 #output preparation
 output_keys=("First name" "Last name" "Student Number" "username" "A1" "A2" "Total" "Grade")
 
 
+echo ${output_keys[*]}
 for KEY in "${!students_rec[@]}"; do
   #printf "$KEY - ${students_rec["$KEY"]}\n"
   eval "${students_rec["$KEY"]}"
   #printf "${students_rec["$KEY"]}\n"
   echo "${students_dic["$KEY"]}"
-  A1=0.0
-  A2=0.0
+  A1=0
+  A2=0
+  A1w=0
+  A2w=0
   total=0
+
+
+  for wiegth in "${!wieghts_rec[@]}"; do
+    eval "${wieghts_rec["$wiegth"]}"
+
+    if [ "${wieghts_dic["Course Work"]}" == "A1" ]
+    then
+      A1w=${wieghts_dic["Weight"]}
+    fi
+
+    if [ "${wieghts_dic["Course Work"]}" == "A2" ]
+    then
+      A2w=${wieghts_dic["Weight"]}
+    fi
+
+
+  done
 
   for mark in "${!Marks[@]}"; do
     eval "${Marks["$mark"]}"
@@ -162,9 +216,12 @@ for KEY in "${!students_rec[@]}"; do
 
   done
 
+  A1="$(calculateGrade $A1 $A1w)"
+  A2="$(calculateGrade $A2 $A2w)"
+
   total=$(echo "$A1 + $A2" | bc)
 
-  echo "${students_dic["First name"]} ${students_dic["Last name"]} ${students_dic["Student Number"]} ${students_dic["username"]} $A1 $A2 $total "
+  echo "${students_dic["First name"]} ${students_dic["Last name"]} ${students_dic["Student Number"]} ${students_dic["username"]} $A1 $A2 $total $(getGrade $total)"
 
  # for KEY in "${!students_dic[@]}"; do
  #   printf "*$KEY* - ${students_dic["$KEY"]}\n"
