@@ -28,6 +28,7 @@ n=1
 index=0
 while IFS= read -r line
 do
+if [[ $line != '' ]]; then  
   if [ $n -eq 1 ];then
     IFS=","
     read -ra ADDR <<<"$line"
@@ -55,6 +56,7 @@ do
 
   fi
   n=$((n+1))
+fi
 done < ${array[0]}
 
 for KEY in "${!students_rec[@]}"; do
@@ -68,6 +70,7 @@ wieghts_keys=("Course Work" "Maximum Possible Mark" "Weight")
 n=1
 index=0
 while IFS= read -r line; do
+if [[ $line != '' ]]; then  
   if [ $n -eq 1 ];then
     IFS=','
     read -ra ADDR <<<"$line"
@@ -95,6 +98,7 @@ while IFS= read -r line; do
     index=$((index+1))
     fi
     n=$((n+1))
+fi
 done < ${array[1]}
 
 for KEY in "${!wieghts_rec[@]}"; do
@@ -113,6 +117,7 @@ for i in *; do
     #echo "I do something with the file $i"
     #echo "${i%%.*}"
     while IFS= read -r line; do
+    if [[ $line != '' ]]; then  
         count=0
         IFS=','
         read -ra ADDR <<<"$line"
@@ -128,6 +133,7 @@ for i in *; do
         string=$(declare -p mark_dic)
         Marks[$index]=${string}
         index=$((index+1))
+    fi
     done < ${i}
   fi
 done
@@ -221,7 +227,7 @@ for KEY in "${!students_rec[@]}"; do
 
   total=$(echo "$A1 + $A2" | bc)
 
-  echo "${students_dic["First name"]} ${students_dic["Last name"]} ${students_dic["Student Number"]} ${students_dic["username"]} $A1 $A2 $total $(getGrade $total)"
+  echo "${students_dic["First name"]} ${students_dic["Last name"]} ${students_dic["Student Number"]} ${students_dic["username"]} ${A1}.0 ${A2}.0 ${total}.0 $(getGrade $total)"
 
  # for KEY in "${!students_dic[@]}"; do
  #   printf "*$KEY* - ${students_dic["$KEY"]}\n"
